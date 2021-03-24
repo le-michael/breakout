@@ -37,8 +37,8 @@ func (g *Game) Init() error {
 		return err
 	}
 
-	spriteShader.SetInteger("image\x00", 0, true)
-	spriteShader.SetMatrix4("projection\x00", projection, false)
+	spriteShader.SetInteger("image", 0, true)
+	spriteShader.SetMatrix4("projection", projection, false)
 
 	g.Renderer = sprite.New(spriteShader)
 

@@ -20,63 +20,67 @@ func (s *Shader) SetFloat(name string, value float32, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform1f(gl.GetUniformLocation(s.ID, gl.Str(name)), value)
+	gl.Uniform1f(s.GetUniformLocation(name), value)
 }
 
 func (s *Shader) SetInteger(name string, value int32, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform1i(gl.GetUniformLocation(s.ID, gl.Str(name)), value)
+	gl.Uniform1i(s.GetUniformLocation(name), value)
 }
 
 func (s *Shader) SetVector2f(name string, x, y float32, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform2f(gl.GetUniformLocation(s.ID, gl.Str(name)), x, y)
+	gl.Uniform2f(s.GetUniformLocation(name), x, y)
 }
 
 func (s *Shader) SetVector2fv(name string, vec mgl32.Vec2, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform2fv(gl.GetUniformLocation(s.ID, gl.Str(name)), 1, &vec[0])
+	gl.Uniform2fv(s.GetUniformLocation(name), 1, &vec[0])
 }
 
 func (s *Shader) SetVector3f(name string, x, y, z float32, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform3f(gl.GetUniformLocation(s.ID, gl.Str(name)), x, y, z)
+	gl.Uniform3f(s.GetUniformLocation(name), x, y, z)
 }
 
 func (s *Shader) SetVector3fv(name string, vec mgl32.Vec3, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform3fv(gl.GetUniformLocation(s.ID, gl.Str(name)), 1, &vec[0])
+	gl.Uniform3fv(s.GetUniformLocation(name), 1, &vec[0])
 }
 
 func (s *Shader) SetVector4f(name string, x, y, z, w float32, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform4f(gl.GetUniformLocation(s.ID, gl.Str(name)), x, y, z, w)
+	gl.Uniform4f(s.GetUniformLocation(name), x, y, z, w)
 }
 
 func (s *Shader) SetVector4fv(name string, vec mgl32.Vec4, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.Uniform4fv(gl.GetUniformLocation(s.ID, gl.Str(name)), 1, &vec[0])
+	gl.Uniform4fv(s.GetUniformLocation(name), 1, &vec[0])
 }
 
 func (s *Shader) SetMatrix4(name string, mat mgl32.Mat4, useShader bool) {
 	if useShader {
 		s.Use()
 	}
-	gl.UniformMatrix4fv(gl.GetUniformLocation(s.ID, gl.Str(name)), 1, false, &mat[0])
+	gl.UniformMatrix4fv(s.GetUniformLocation(name), 1, false, &mat[0])
+}
+
+func (s *Shader) GetUniformLocation(name string) int32 {
+	return gl.GetUniformLocation(s.ID, gl.Str(name+"\x00"))
 }
 
 func Compile(vertexSource, fragmentSource string) (*Shader, error) {

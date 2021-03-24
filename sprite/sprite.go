@@ -1,10 +1,9 @@
 package sprite
 
 import (
-	"fmt"
-
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
+
 	"github.com/le-michael/breakout/shader"
 	"github.com/le-michael/breakout/texture"
 )
@@ -52,9 +51,8 @@ func (s *SpriteRenderer) Draw(tex *texture.Texture2D, position mgl32.Vec2, size 
 
 	model = model.Mul4(mgl32.Scale3D(size.X(), size.Y(), 1))
 
-	s.Shader.SetMatrix4("model\x00", model, false)
-
-	s.Shader.SetVector3fv("spriteColor\x00", color, false)
+	s.Shader.SetMatrix4("model", model, false)
+	s.Shader.SetVector3fv("spriteColor", color, false)
 
 	gl.ActiveTexture(gl.TEXTURE0)
 	tex.Bind()
