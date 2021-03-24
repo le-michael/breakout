@@ -23,8 +23,8 @@ func (g *GameObject) Draw(renderer *sprite.SpriteRenderer) {
 	renderer.Draw(g.Sprite, g.Position, g.Size, g.Rotation, g.Color)
 }
 
-func Default() *GameObject {
-	return New(
+func DefaultGameObject() *GameObject {
+	return NewGameObject(
 		mgl32.Vec2{0, 0},
 		mgl32.Vec2{1, 1},
 		mgl32.Vec2{0, 0},
@@ -33,7 +33,7 @@ func Default() *GameObject {
 	)
 }
 
-func New(position, size, velocity mgl32.Vec2, color mgl32.Vec3, sprite *texture.Texture2D) *GameObject {
+func NewGameObject(position, size, velocity mgl32.Vec2, color mgl32.Vec3, sprite *texture.Texture2D) *GameObject {
 	return &GameObject{
 		Position:  position,
 		Size:      size,

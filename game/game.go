@@ -21,6 +21,9 @@ const (
 var (
 	playerSize     = mgl32.Vec2{200, 20}
 	playerVelocity = float32(500.0)
+
+	ballRadius   = float32(12.5)
+	ballVelocity = mgl32.Vec2{-100, -350}
 )
 
 type Game struct {
@@ -33,6 +36,7 @@ type Game struct {
 	level  uint32
 
 	Player *object.GameObject
+	Ball   *object.Ball
 
 	Renderer *sprite.SpriteRenderer
 }
@@ -79,19 +83,27 @@ func (g *Game) Init() error {
 	g.Levels = append(g.Levels, one)
 
 	// Player
-	paddle, err := resmgr.GetTexture("paddle")
+	paddleSpr, err := resmgr.GetTexture("paddle")
 	if err != nil {
 		return err
 	}
 
 	playerPos := mgl32.Vec2{float32(g.Width)/2 - playerSize.X()/2, float32(g.Height) - playerSize.Y()}
-	g.Player = object.New(playerPos, playerSize, mgl32.Vec2{}, mgl32.Vec3{1, 1, 1}, paddle)
+	g.Player = object.NewGameObject(playerPos, playerSize, mgl32.Vec2{}, mgl32.Vec3{1, 1, 1}, paddleSpr)
+
+	// Ball
+	ballSpr, err := resmgr.GetTexture("face")
+	if err != nil {
+		return err
+	}
+	ballPos := playerPos.Add(mgl32.Vec2{playerSize.X()/2 - ballRadius, -ballRadius * 2})
+	g.Ball = object.NewBall(ballPos, ballRadius, ballVelocity, ballSpr)
 
 	return nil
 }
 
 func (g *Game) Update(dt float32) {
-
+	g.Ball.Move(dt, g.Width)
 }
 
 func (g *Game) ProcessInput(dt float32) {
@@ -100,12 +112,21 @@ func (g *Game) ProcessInput(dt float32) {
 		if g.Keys[glfw.KeyA] {
 			if g.Player.Position.X() >= 0 {
 				g.Player.Position = g.Player.Position.Add(mgl32.Vec2{-velocity, 0})
+				if g.Ball.Stuck {
+					g.Ball.Position = g.Ball.Position.Add(mgl32.Vec2{-velocity, 0})
+				}
 			}
 		}
 		if g.Keys[glfw.KeyD] {
 			if g.Player.Position.X() <= float32(g.Width)-playerSize.X() {
 				g.Player.Position = g.Player.Position.Add(mgl32.Vec2{velocity, 0})
+				if g.Ball.Stuck {
+					g.Ball.Position = g.Ball.Position.Add(mgl32.Vec2{velocity, 0})
+				}
 			}
+		}
+		if g.Keys[glfw.KeySpace] {
+			g.Ball.Stuck = false
 		}
 	}
 }
@@ -114,6 +135,7 @@ func (g *Game) Render() {
 	if g.State == GameActive {
 		g.Levels[g.level].Draw(g.Renderer)
 		g.Player.Draw(g.Renderer)
+		g.Ball.Draw(g.Renderer)
 	}
 }
 

@@ -87,7 +87,7 @@ func newLevel(tileData [][]byte, levelWidth int, levelHeight int) (*GameLevel, e
 				if err != nil {
 					return nil, err
 				}
-				brick := object.New(pos, size, vel, colors[col], tex)
+				brick := object.NewGameObject(pos, size, vel, colors[col], tex)
 				brick.IsSolid = true
 				gameLevel.Bricks = append(gameLevel.Bricks, brick)
 			default:
@@ -95,7 +95,7 @@ func newLevel(tileData [][]byte, levelWidth int, levelHeight int) (*GameLevel, e
 				if err != nil {
 					return nil, err
 				}
-				brick := object.New(pos, size, vel, colors[col], tex)
+				brick := object.NewGameObject(pos, size, vel, colors[col], tex)
 				gameLevel.Bricks = append(gameLevel.Bricks, brick)
 			}
 		}
