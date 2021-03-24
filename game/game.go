@@ -19,11 +19,11 @@ func (g *Game) Init() {
 
 }
 
-func (g *Game) Update(dt float32) {
+func (g *Game) Update(dt float64) {
 
 }
 
-func (g *Game) ProcessInput(dt float32) {
+func (g *Game) ProcessInput(dt float64) {
 
 }
 
