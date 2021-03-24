@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"image"
 	"image/draw"
+	_ "image/png"
 	"io/ioutil"
 	"os"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
+
 	"github.com/le-michael/breakout/shader"
 	"github.com/le-michael/breakout/texture"
 )
@@ -41,12 +43,21 @@ func GetShader(name string) (*shader.Shader, error) {
 	return program, nil
 }
 
-func LoadTexture(tFile string, alpha bool) error {
+func GetTexture(name string) (*texture.Texture2D, error) {
+	tex, ok := rm.Textures[name]
+	if !ok {
+		return nil, fmt.Errorf("unable to find texture: %v", name)
+	}
+	return tex, nil
+}
+
+func LoadTexture(tFile string, alpha bool, name string) error {
 	tex, err := loadTextureFromFile(tFile, alpha)
 	if err != nil {
 		return fmt.Errorf("unable to load texture %v: %v", tFile, err)
 	}
-	rm.Textures[tFile] = tex
+
+	rm.Textures[name] = tex
 	return nil
 }
 
@@ -75,6 +86,11 @@ func loadTextureFromFile(tFile string, alpha bool) (*texture.Texture2D, error) {
 
 	tex := texture.New()
 	tex.Generate(rgba)
+
+	if alpha {
+		tex.ImageFormat = gl.RGBA
+		tex.InternalFormat = gl.RGBA
+	}
 
 	return tex, nil
 }

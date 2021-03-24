@@ -29,19 +29,20 @@ func main() {
 	}
 	defer glfw.Terminate()
 
+	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.ContextVersionMajor, 4)
 	glfw.WindowHint(glfw.ContextVersionMinor, 1)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 	window, err := glfw.CreateWindow(windowWidth, windowHeight, "Breakout", nil, nil)
 	if err != nil {
-		log.Fatalln("unable to create window:", err)
+		log.Fatalln("Unable to create window:", err)
 	}
 
 	window.MakeContextCurrent()
 
 	if err := gl.Init(); err != nil {
-		log.Fatalln("unable to initalize opengl:", err)
+		log.Fatalln("Unable to initalize opengl:", err)
 	}
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
@@ -53,7 +54,9 @@ func main() {
 	gl.Enable(gl.BLEND)
 	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	breakout.Init()
+	if err := breakout.Init(); err != nil {
+		log.Fatalln("Unable to initalize breakout:", err)
+	}
 
 	var deltaTime, lastFrame float64
 	deltaTime = 0
