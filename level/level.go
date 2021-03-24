@@ -17,7 +17,6 @@ type GameLevel struct {
 
 func (g *GameLevel) Draw(renderer *sprite.SpriteRenderer) {
 	for _, brick := range g.Bricks {
-		fmt.Println(brick)
 		brick.Draw(renderer)
 	}
 }

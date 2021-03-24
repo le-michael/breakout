@@ -58,12 +58,12 @@ func main() {
 		log.Fatalln("Unable to initalize breakout:", err)
 	}
 
-	var deltaTime, lastFrame float64
+	var deltaTime, lastFrame float32
 	deltaTime = 0
 	lastFrame = 0
 
 	for !window.ShouldClose() {
-		currentFrame := glfw.GetTime()
+		currentFrame := float32(glfw.GetTime())
 		deltaTime = currentFrame - lastFrame
 		lastFrame = currentFrame
 		glfw.PollEvents()
@@ -90,7 +90,6 @@ func keyCallback(window *glfw.Window, key glfw.Key, scancode int, action glfw.Ac
 	if key >= 0 && key < 1024 {
 		if action == glfw.Press {
 			breakout.Keys[key] = true
-			fmt.Println(key)
 		} else if action == glfw.Release {
 			breakout.Keys[key] = false
 		}
