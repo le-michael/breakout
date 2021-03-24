@@ -7,7 +7,12 @@ import (
 	"github.com/le-michael/breakout/texture"
 )
 
+type Object interface {
+	Draw(*sprite.SpriteRenderer)
+}
+
 type GameObject struct {
+	Object
 	Position  mgl32.Vec2
 	Size      mgl32.Vec2
 	Velocity  mgl32.Vec2
@@ -20,7 +25,9 @@ type GameObject struct {
 }
 
 func (g *GameObject) Draw(renderer *sprite.SpriteRenderer) {
-	renderer.Draw(g.Sprite, g.Position, g.Size, g.Rotation, g.Color)
+	if !g.Destroyed {
+		renderer.Draw(g.Sprite, g.Position, g.Size, g.Rotation, g.Color)
+	}
 }
 
 func DefaultGameObject() *GameObject {

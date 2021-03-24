@@ -104,6 +104,8 @@ func (g *Game) Init() error {
 
 func (g *Game) Update(dt float32) {
 	g.Ball.Move(dt, g.Width)
+
+	g.DoCollisions()
 }
 
 func (g *Game) ProcessInput(dt float32) {
@@ -139,6 +141,54 @@ func (g *Game) Render() {
 	}
 }
 
+func (g *Game) DoCollisions() {
+	for _, block := range g.Levels[g.level].Bricks {
+		if !block.Destroyed {
+			collision := CheckBallCollision(g.Ball, block)
+			if collision.Collide {
+				if !block.IsSolid {
+					block.Destroyed = true
+				}
+				dir := collision.Direction
+				diff := collision.Difference
+				if dir == Right || dir == Left {
+					g.Ball.Velocity = mgl32.Vec2{-g.Ball.Velocity.X(), g.Ball.Velocity.Y()}
+
+					penetration := g.Ball.Radius - mgl32.Abs(diff.X())
+					if dir == Left {
+						g.Ball.Position = mgl32.Vec2{g.Ball.Position.X() + penetration, g.Ball.Position.Y()}
+					} else {
+						g.Ball.Position = mgl32.Vec2{g.Ball.Position.X() - penetration, g.Ball.Position.Y()}
+					}
+				} else {
+					g.Ball.Velocity = mgl32.Vec2{g.Ball.Velocity.X(), -g.Ball.Velocity.Y()}
+
+					penetration := g.Ball.Radius - mgl32.Abs(diff.Y())
+					if dir == Up {
+						g.Ball.Position = mgl32.Vec2{g.Ball.Position.X(), g.Ball.Position.Y() - penetration}
+					} else {
+						g.Ball.Position = mgl32.Vec2{g.Ball.Position.X(), g.Ball.Position.Y() + penetration}
+					}
+				}
+			}
+		}
+	}
+
+	collision := CheckBallCollision(g.Ball, g.Player)
+	if !g.Ball.Stuck && collision.Collide {
+		centerBoard := g.Player.Position.X() + g.Player.Size.X()/2
+		distance := g.Ball.Position.X() + g.Ball.Radius - centerBoard
+		percentage := distance / (g.Player.Size.X() / 2)
+		strength := float32(2)
+		oldVelocity := g.Ball.Velocity
+		g.Ball.Velocity = mgl32.Vec2{
+			ballVelocity.X() * percentage * strength,
+			-1.0 * mgl32.Abs(g.Ball.Velocity.Y()),
+		}
+		g.Ball.Velocity = g.Ball.Velocity.Normalize().Mul(oldVelocity.Len())
+	}
+}
+
 func New(width, height int) *Game {
 	return &Game{
 		State:  GameActive,
@@ -146,4 +196,64 @@ func New(width, height int) *Game {
 		Width:  width,
 		Height: height,
 	}
+}
+
+type Collision struct {
+	Collide    bool
+	Direction  Direction
+	Difference mgl32.Vec2
+}
+
+func CheckCollision(a *object.GameObject, b *object.GameObject) bool {
+	collisionX := a.Position.X()+a.Size.X() >= b.Position.X() && b.Position.X()+b.Size.X() >= a.Position.X()
+	collisionY := a.Position.Y()+a.Size.Y() >= b.Position.Y() && b.Position.Y()+b.Size.Y() >= a.Position.Y()
+	return collisionX && collisionY
+}
+
+func CheckBallCollision(b *object.Ball, other *object.GameObject) Collision {
+	center := b.Position.Add(mgl32.Vec2{b.Radius, b.Radius})
+	aabbHalfExtents := other.Size.Mul(0.5)
+	aabbCenter := other.Position.Add(aabbHalfExtents)
+	difference := center.Sub(aabbCenter)
+
+	clamped := mgl32.Vec2{
+		mgl32.Clamp(difference.X(), -aabbHalfExtents.X(), aabbHalfExtents.X()),
+		mgl32.Clamp(difference.Y(), -aabbHalfExtents.Y(), aabbHalfExtents.Y()),
+	}
+	closest := aabbCenter.Add(clamped)
+	difference = closest.Sub(center)
+	if difference.Len() < b.Radius {
+		return Collision{true, VectorDirection(difference), difference}
+	}
+
+	return Collision{false, Up, mgl32.Vec2{}}
+}
+
+type Direction int
+
+const (
+	Up Direction = iota
+	Right
+	Down
+	Left
+)
+
+func VectorDirection(target mgl32.Vec2) Direction {
+	compass := []mgl32.Vec2{
+		{0, 1},
+		{1, 0},
+		{0, -1},
+		{-1, 0},
+	}
+	max := float32(0.0)
+	best := -1
+	for i := range compass {
+		dot := target.Normalize().Dot(compass[i])
+		if dot > max {
+			max = dot
+			best = i
+		}
+	}
+
+	return Direction(best)
 }
