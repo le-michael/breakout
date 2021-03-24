@@ -80,9 +80,9 @@ func newLevel(tileData [][]byte, levelWidth int, levelHeight int) (*GameLevel, e
 			size := mgl32.Vec2{unitWidth, unitHeight}
 			vel := mgl32.Vec2{0, 0}
 			switch col {
-			case '0':
+			case 0:
 				continue
-			case '1':
+			case 1:
 				tex, err := resmgr.GetTexture("block_solid")
 				if err != nil {
 					return nil, err
